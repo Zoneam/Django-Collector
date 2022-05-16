@@ -1,25 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-
+from .models import Gorilla
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
-
-class Gorilla:
-    def __init__(self, name, breed, description, age):
-        self.name = name
-        self.breed = breed
-        self.description = description
-        self.age = age
-
-gorillas = [
-    Gorilla('Abxazzarz', 'Shizi', 'Mountain Gorilla', 11),
-    Gorilla('Tivandin', 'Dodoz', 'Cross River Gorilla', 0),
-    Gorilla('Rabazanter', 'Alpine Drau', '7 legged gorilla', 5),
-    Gorilla('Tixaro', 'Bilduz', 'Gorilla', 12),
-    Gorilla('Artsvaqar', 'Entramo', 'Cross River Gorilla', 1),
-    Gorilla('Ebaladin', 'Alpine Drau', '1 legged gorilla', 0),
-]
 
 def home(request):
     """
@@ -49,4 +33,14 @@ def gorillas_index(request):
     # context means : a dictionary of values to add to the template
     # context must have two values {'key': 'value'}
     # key we can use inside the template
+    gorillas = Gorilla.objects.all()
     return render(request, 'gorillas/index.html', {'gorillas': gorillas})
+
+
+def gorilla_detail(request, gorilla_id):
+    """
+    gorillas detail pages
+    http://localhost:8000/gorillas/:gorilla_id   
+    """
+    gorilla = Gorilla.objects.get(id=gorilla_id)
+    return render(request, 'gorillas/detail.html', {'gorilla': gorilla})

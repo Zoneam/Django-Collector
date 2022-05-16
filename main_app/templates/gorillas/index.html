@@ -3,17 +3,20 @@
 <h1> All gorillas </h1>
 
 {% for gorilla in gorillas %}
+
     <div class="card">
-        <div class="card-content">
-            <span class="card-title">{{ gorilla.name }}</span>
-            <p>Breed: {{ gorilla.breed }}</p>
-            <p>Description: {{ gorilla.description }}</p>
-            {% if gorilla.age > 0 %}
-                <p>Age: {{ gorilla.age }}</p>
-            {% else %}
-                <p>Age: Goritten</p>
-            {% endif %}
-        </div>
+        <a href="/gorillas/{{gorilla.id}}">
+            <div class="card-content">
+                <span class="card-title">{{ gorilla.name }}</span>
+                <p>Breed: {{ gorilla.breed }}</p>
+                <p>Description: {{ gorilla.description }}</p>
+                {% if gorilla.age > 0 %}
+                    <p>Age: {{ gorilla.age }}</p>
+                {% else %}
+                    <p>Age: Goritten</p>
+                {% endif %}
+            </div>
+        </a>
     </div>
 {% endfor %}
 {% endblock %}
