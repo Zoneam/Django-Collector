@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound
 from .models import Gorilla
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -34,7 +34,7 @@ def gorillas_index(request):
     # context must have two values {'key': 'value'}
     # key we can use inside the template
     gorillas = Gorilla.objects.all()
-    return render(request, 'gorillas/index.html', {'gorillas': gorillas})
+    return render(request, 'gorillas/index.html', { 'gorillas': gorillas })
 
 
 def gorilla_detail(request, gorilla_id):
@@ -42,5 +42,8 @@ def gorilla_detail(request, gorilla_id):
     gorillas detail pages
     http://localhost:8000/gorillas/:gorilla_id   
     """
-    gorilla = Gorilla.objects.get(id=gorilla_id)
-    return render(request, 'gorillas/detail.html', {'gorilla': gorilla})
+    try:
+        gorilla = Gorilla.objects.get(id=gorilla_id)
+        return render(request, 'gorillas/detail.html', { 'gorilla': gorilla })
+    except Gorilla.DoesNotExist:
+        return HttpResponseNotFound("<h1 style='text-align: center; margin-top: 200px;'>ERROR <span style='color: red; font-size:70px'>404</span> PAGE NOT FOUND !</h1>")

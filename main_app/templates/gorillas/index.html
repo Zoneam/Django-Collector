@@ -5,7 +5,8 @@
 {% for gorilla in gorillas %}
 
     <div class="card">
-        <a href="/gorillas/{{gorilla.id}}">
+        {% comment %} <a href="/gorillas/{{gorilla.id}}"> {% endcomment %}
+        <a href="{% url 'detail'  gorilla.id %}"
             <div class="card-content">
                 <span class="card-title">{{ gorilla.name }}</span>
                 <p>Breed: {{ gorilla.breed }}</p>
