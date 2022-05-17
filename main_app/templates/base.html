@@ -14,11 +14,12 @@
     <nav>
       <div class="nav-wrapper">
         <ul>
-          <li><a href="/" class="left brand-logo">&nbsp;&nbsp;GorillaCollector</a></li>
+          <li><a href="{% url 'home' %}" class="left brand-logo">&nbsp;&nbsp;GorillaCollector</a></li>
         </ul>
         <ul class="right">
-          <li><a href="/about">About</a></li>
-          <li><a href="/gorillas">View All My Gorillas</a></li>
+          <li><a href="{% url 'about' %}">About</a></li>
+          <li><a href="{% url 'gorillas_create' %}">Add a Cat</a></li>
+          <li><a href="{% url 'index' %}">View All My Gorillas</a></li>
         </ul>
       </div>
     </nav>
