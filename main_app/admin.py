@@ -1,5 +1,8 @@
 from django.contrib import admin
-from .models import Gorilla
+# import your models here
+from .models import Gorilla, Feeding, Toy
 
+# Register your models here
 admin.site.register(Gorilla)
-# Register your models here.
+admin.site.register(Feeding)
+admin.site.register(Toy)
