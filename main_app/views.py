@@ -1,16 +1,15 @@
+import boto3
+import uuid, os
 from django.shortcuts import redirect, render
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from .models import Gorilla, Toy
+from .models import Gorilla, Toy, Photo
 from .forms import FeedingForm
+from django.views.generic import ListView, DetailView
 from django.http import HttpResponseNotFound
-
-
-# View functions
 
 
 def home(request):
     return render(request, 'home.html')
-
 
 def about(request):
     return render(request, 'about.html')
@@ -28,7 +27,6 @@ def gorilla_detail(request, gorilla_id):
         feeding_form = FeedingForm()
         return render(request, 'gorillas/detail.html', {'gorilla': gorilla, 'feeding_form': FeedingForm, 'toys': toys_gorilla_doesnt_have,})
     except Gorilla.DoesNotExist:
-        # return HttpResponseNotFound("<h1 style='text-align: center; margin-top: 200px;'>ERROR <span style='color: red; font-size:70px'>404</span> PAGE NOT FOUND !</h1><h2 style='text-align: center;'>No Gorillas Here Sorry !!!</h2>")
         return render(request, 'notfound.html')
 
 def add_feeding(request, gorilla_id):
@@ -43,6 +41,29 @@ def assoc_toy(request, gorilla_id, toy_id):
     Gorilla.objects.get(id = gorilla_id).toys.add(toy_id)
     return redirect('detail', gorilla_id = gorilla_id)
 
+def unassoc_toy(request, gorilla_id, toy_id):
+    Gorilla.objects.get(id=gorilla_id).toys.remove(toy_id)
+    return redirect('detail', gorilla_id=gorilla_id)
+
+def add_photo(request, gorilla_id):
+    # photo-file will be the "name" attribute on the <input type="file">
+    photo_file = request.FILES.get('photo-file', None)
+    if photo_file:
+        s3 = boto3.client('s3')
+        # need a unique "key" for S3 / needs image file extension too
+        key = uuid.uuid4().hex[:6] + photo_file.name[photo_file.name.rfind('.'):]
+        # just in case something goes wrong
+        try:
+            bucket = os.environ['S3_BUCKET']
+            s3.upload_fileobj(photo_file, bucket, key)
+            # build the full url string
+            url = f"{os.environ['S3_BASE_URL']}{bucket}/{key}"
+            # we can assign to gorilla_id or gorilla (if you have a gorilla object)
+            Photo.objects.create(url=url, gorilla_id=gorilla_id)
+        except:
+            print('An error occurred uploading file to S3')
+    return redirect('detail', gorilla_id=gorilla_id)
+
 
 class GorillaCreate(CreateView):
     model = Gorilla
@@ -54,9 +75,27 @@ class GorillaUpdate(UpdateView):
     model = Gorilla
     # Let's disallow the renaming of a gorilla by excluding the name field!
     fields = ['breed', 'description', 'age']
+    success_url = '/gorillas/'
 
 
 class GorillaDelete(DeleteView):
     model = Gorilla
     success_url = '/gorillas/'
+    
+class ToyList(ListView):
+      model = Toy
 
+class ToyDetail(DetailView):
+  model = Toy
+
+class ToyCreate(CreateView):
+  model = Toy
+  fields = '__all__'
+
+class ToyUpdate(UpdateView):
+  model = Toy
+  fields = ['name', 'color']
+
+class ToyDelete(DeleteView):
+  model = Toy
+  success_url = '/toys/'
