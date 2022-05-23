@@ -1,6 +1,7 @@
 from django.db import models
 from django.urls import reverse
 from datetime import date
+from django.contrib.auth.models import User
 
 MEALS = (
     ('B', 'Breakfast'),
@@ -23,6 +24,7 @@ class Gorilla(models.Model):
     description = models.TextField(max_length=100)
     age = models.IntegerField()
     toys = models.ManyToManyField(Toy, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     
     def __str__(self):
         return self.name
@@ -36,7 +38,7 @@ class Gorilla(models.Model):
     
 class Photo(models.Model):
     url = models.CharField(max_length=200)
-    gorilla = models.ForeignKey(Gorilla, on_delete = models.CASCADE)
+    gorilla = models.ForeignKey(Gorilla, on_delete = models.DO_NOTHING)
   
     def __str__(self):
         return f"Photo for gorilla_id: {self.gorilla.id} @ {self.url}"

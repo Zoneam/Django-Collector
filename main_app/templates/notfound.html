@@ -1,16 +1,30 @@
+{% extends 'base.html' %} {% block content %}
+<h1 style="text-align: center; margin-top: -30px">
+  <span style="width: 236px; position: relative;top: 41px;display:inline-block;">
+    <lottie-player
+      style="margin: auto"
+      src="../static/404.json"
+      background="transparent"
+      speed="1"
+      style="width: 100px; height: 100px"
+      loop
+      autoplay
+    >
+    </lottie-player>
+  </span>
+  PAGE NOT FOUND !
+</h1>
+<h2 style="text-align: center">
+  No Gorillas Here Sorry
+</h2>
+  <lottie-player
+    src="../static/gorilla.json"
+    background="transparent"
+    speed="1"
+    style="position: relative;top: -141px;text-align: center"
+    loop
+    autoplay
+  >
+  </lottie-player>
 
-{% extends 'base.html' %}
-{% block content %}
-<h1 style='text-align: center; margin-top: 200px;'>ERROR 
-    <span style='color: red; font-size:105px'>
-        404
-    </span>
-     PAGE NOT FOUND !
-    </h1>
-    <h2 style='text-align: center;'>
-        No Gorillas Here Sorry 
-        <lottie-player style='margin: auto;' src='../static/gorilla.json' background='transparent'  speed='1'  style='width: 300px; height: 300px;' loop  autoplay>
-        </lottie-player>
-    </h2>
 {% endblock %}
-

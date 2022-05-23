@@ -1,25 +1,33 @@
+import os
+import uuid
 import boto3
-import uuid, os
-from django.shortcuts import redirect, render
+from django.shortcuts import render, redirect
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView
 from .models import Gorilla, Toy, Photo
 from .forms import FeedingForm
-from django.views.generic import ListView, DetailView
-from django.http import HttpResponseNotFound
+from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 def home(request):
     return render(request, 'home.html')
 
+
+@login_required
 def about(request):
     return render(request, 'about.html')
 
 
+@login_required
 def gorillas_index(request):
-    gorillas = Gorilla.objects.all()
+    gorillas = Gorilla.objects.filter(user=request.user)
     return render(request, 'gorillas/index.html', {'gorillas': gorillas})
 
 
+@login_required
 def gorilla_detail(request, gorilla_id):
     try:
         gorilla = Gorilla.objects.get(id=gorilla_id)
@@ -29,6 +37,28 @@ def gorilla_detail(request, gorilla_id):
     except Gorilla.DoesNotExist:
         return render(request, 'notfound.html')
 
+
+def signup(request):
+    error_message = ''
+    if request.method == 'POST':
+    # This is how to create a 'user' form object
+    # that includes the data from the browser
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+      # This will add the user to the database
+            user = form.save()
+      # This is how we log a user in via code
+            login(request, user)
+            return redirect('index')
+        else:
+            error_message = 'Invalid sign up - try again'
+  # A bad POST or a GET request, so render signup.html with an empty form
+    form = UserCreationForm()
+    context = {'form': form, 'error_message': error_message}
+    return render(request, 'registration/signup.html', context)
+
+
+@login_required
 def add_feeding(request, gorilla_id):
     form = FeedingForm(request.POST)
     if form.is_valid():
@@ -37,6 +67,8 @@ def add_feeding(request, gorilla_id):
         new_feeding.save()
     return redirect('detail', gorilla_id = gorilla_id)
 
+
+@login_required
 def assoc_toy(request, gorilla_id, toy_id):
     Gorilla.objects.get(id = gorilla_id).toys.add(toy_id)
     return redirect('detail', gorilla_id = gorilla_id)
@@ -45,6 +77,8 @@ def unassoc_toy(request, gorilla_id, toy_id):
     Gorilla.objects.get(id=gorilla_id).toys.remove(toy_id)
     return redirect('detail', gorilla_id=gorilla_id)
 
+
+@login_required
 def add_photo(request, gorilla_id):
     # photo-file will be the "name" attribute on the <input type="file">
     photo_file = request.FILES.get('photo-file', None)
@@ -65,37 +99,39 @@ def add_photo(request, gorilla_id):
     return redirect('detail', gorilla_id=gorilla_id)
 
 
-class GorillaCreate(CreateView):
+class GorillaCreate(LoginRequiredMixin, CreateView):
     model = Gorilla
     fields = '__all__'
-    success_url = '/gorillas/'
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
 
 
-class GorillaUpdate(UpdateView):
+class GorillaUpdate(LoginRequiredMixin, UpdateView):
     model = Gorilla
     # Let's disallow the renaming of a gorilla by excluding the name field!
     fields = ['breed', 'description', 'age']
     success_url = '/gorillas/'
 
 
-class GorillaDelete(DeleteView):
+class GorillaDelete(LoginRequiredMixin, DeleteView):
     model = Gorilla
     success_url = '/gorillas/'
     
-class ToyList(ListView):
+class ToyList(LoginRequiredMixin, ListView):
       model = Toy
 
-class ToyDetail(DetailView):
+class ToyDetail(LoginRequiredMixin, DetailView):
   model = Toy
 
-class ToyCreate(CreateView):
+class ToyCreate(LoginRequiredMixin, CreateView):
   model = Toy
   fields = '__all__'
 
-class ToyUpdate(UpdateView):
+class ToyUpdate(LoginRequiredMixin, UpdateView):
   model = Toy
   fields = ['name', 'color']
 
-class ToyDelete(DeleteView):
+class ToyDelete(LoginRequiredMixin, DeleteView):
   model = Toy
   success_url = '/toys/'

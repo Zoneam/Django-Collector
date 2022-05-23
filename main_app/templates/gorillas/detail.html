@@ -72,12 +72,19 @@
               A <span style="color: {{ toy.color }}">{{ toy.color }}</span> {{ toy.name }}
             </span>
           </div>
+        <div class="card-action">
+            <form action="{% url 'unassoc_toy' gorilla.id toy.id %}" method="post">
+              {% csrf_token %}
+              <button type="submit" class="btn">Remove</button>
+            </form>
+          </div>
         </div>
       {% endfor %}
     {% else %}
       <h5>No Toys :(</h5>
     {% endif %}
   </div>
+  
   <div class="col s6">
     <h3>Available Toys</h3>
     {% if toys.count %}
