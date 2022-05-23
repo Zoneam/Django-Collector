@@ -76,8 +76,12 @@ WSGI_APPLICATION = 'collector.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'gorillacollector',
+        'USER': 'myappuser',
+        'PASSWORD': 'mypass',
+        'HOST': 'localhost',
+        'PORT': 5432
     }
 }
 
@@ -118,7 +122,16 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+
+LOGIN_REDIRECT_URL = '/gorillas/'
+LOGOUT_REDIRECT_URL = '/'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+import environ
+environ.Env()
+environ.Env.read_env()
